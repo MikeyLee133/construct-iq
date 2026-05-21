@@ -8,13 +8,15 @@ queries can be filtered to a specific project.
 
 from __future__ import annotations
 
+from typing import Any
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
 from construct_iq.config import CHROMA_DIR, EMBEDDING_MODEL, TOP_K_RESULTS
 
 _model: SentenceTransformer | None = None
-_client: chromadb.PersistentClient | None = None
+_client: Any = None
 
 
 def _get_model() -> SentenceTransformer:
@@ -24,7 +26,7 @@ def _get_model() -> SentenceTransformer:
     return _model
 
 
-def _get_client() -> chromadb.PersistentClient:
+def _get_client() -> Any:
     global _client
     if _client is None:
         _client = chromadb.PersistentClient(path=str(CHROMA_DIR))

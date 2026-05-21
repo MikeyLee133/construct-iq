@@ -85,7 +85,7 @@ def create_project(name: str, address: str, status: str, start_date: date | None
             "INSERT INTO projects (name, address, status, start_date) VALUES (?,?,?,?)",
             (name, address, status, start_date.isoformat() if start_date else None),
         )
-        return cur.lastrowid  # type: ignore[return-value]
+        return cur.lastrowid or 0
 
 
 def get_all_projects() -> list[dict]:
@@ -145,7 +145,7 @@ def create_note(phase_id: int, content: str) -> int:
             "INSERT INTO notes (phase_id, content) VALUES (?,?)",
             (phase_id, content),
         )
-        return cur.lastrowid  # type: ignore[return-value]
+        return cur.lastrowid or 0
 
 
 def get_notes(phase_id: int) -> list[dict]:
@@ -185,7 +185,7 @@ def create_expense(
             "INSERT INTO expenses (phase_id, amount, category, expense_date, description, receipt_path) VALUES (?,?,?,?,?,?)",
             (phase_id, amount, category, expense_date.isoformat(), description, receipt_path),
         )
-        return cur.lastrowid  # type: ignore[return-value]
+        return cur.lastrowid or 0
 
 
 def get_expenses(phase_id: int) -> list[dict]:
@@ -223,7 +223,7 @@ def create_document(phase_id: int, filename: str, file_path: str, file_type: str
             "INSERT INTO documents (phase_id, filename, file_path, file_type) VALUES (?,?,?,?)",
             (phase_id, filename, file_path, file_type),
         )
-        return cur.lastrowid  # type: ignore[return-value]
+        return cur.lastrowid or 0
 
 
 def get_documents(phase_id: int) -> list[dict]:
