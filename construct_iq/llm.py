@@ -5,6 +5,8 @@ Ollama interface. Builds a grounded prompt from retrieved chunks
 and returns a plain-English answer with source citations.
 """
 
+from __future__ import annotations
+
 import ollama
 
 from construct_iq.config import OLLAMA_MODEL

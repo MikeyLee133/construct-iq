@@ -6,6 +6,8 @@ Each chunk is tagged with project_id, phase_id, and source so
 queries can be filtered to a specific project.
 """
 
+from __future__ import annotations
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
