@@ -5,6 +5,12 @@ ConstructIQ — AI-powered construction project management.
 Run with:  streamlit run app.py
 """
 
+import os
+import warnings
+
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
+
 import streamlit as st
 
 from construct_iq.database import init_db
@@ -19,8 +25,8 @@ st.set_page_config(
 )
 
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 /* ── Base ────────────────────────────────────────── */
 html, body, .stApp,
 [data-testid="stAppViewContainer"],
