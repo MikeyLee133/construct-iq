@@ -19,87 +19,217 @@ st.set_page_config(
 )
 
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 <style>
+/* ── Base ────────────────────────────────────────── */
+html, body, .stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+[data-testid="stBottom"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    background-color: #f7f5f1 !important;
+}
+
 /* ── Chrome ──────────────────────────────────────── */
 footer { visibility: hidden; }
 [data-testid="stHeader"] { display: none; }
-[data-testid="stAppViewBlockContainer"] { padding-top: 1.5rem; }
+[data-testid="stAppViewBlockContainer"] { padding-top: 2.5rem; }
 
 /* ── Cards ───────────────────────────────────────── */
 [data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 14px !important;
-    border-color: #e2e8f0 !important;
-    box-shadow: 0 2px 10px rgba(15,23,42,0.07) !important;
-    transition: box-shadow 0.15s ease !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    border: 1px solid #e9e4dc !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 20px rgba(0,0,0,0.05) !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease !important;
 }
 [data-testid="stVerticalBlockBorderWrapper"]:hover {
-    box-shadow: 0 4px 20px rgba(15,23,42,0.12) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.07), 0 16px 48px rgba(0,0,0,0.07) !important;
+    transform: translateY(-2px) !important;
 }
 
 /* ── Metrics ─────────────────────────────────────── */
 [data-testid="metric-container"] {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem 1.25rem !important;
+    background: #ffffff !important;
+    border: 1px solid #e9e4dc !important;
+    border-radius: 14px !important;
+    padding: 1.25rem 1.5rem !important;
 }
-[data-testid="stMetricValue"] { font-weight: 700 !important; color: #0f172a !important; }
-[data-testid="stMetricLabel"] { color: #64748b !important; font-size: 0.8rem !important; font-weight: 500 !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; }
+[data-testid="stMetricValue"] {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    color: #0c0a09 !important;
+}
+[data-testid="stMetricLabel"] {
+    font-family: 'Inter', sans-serif !important;
+    color: #79716b !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.07em !important;
+}
+[data-testid="stMetricDelta"] { font-family: 'Inter', sans-serif !important; }
 
 /* ── Progress bar ────────────────────────────────── */
 [role="progressbar"] {
-    height: 8px !important;
+    height: 6px !important;
     border-radius: 99px !important;
-    background: #e0e7ff !important;
+    background: #e9e4dc !important;
 }
 [role="progressbar"] > div {
-    background: linear-gradient(90deg, #3b82f6, #6366f1) !important;
+    background: #0c0a09 !important;
     border-radius: 99px !important;
 }
 
 /* ── Buttons ─────────────────────────────────────── */
-.stButton > button {
+.stButton > button,
+.stFormSubmitButton > button {
+    font-family: 'Inter', sans-serif !important;
     border-radius: 8px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    letter-spacing: 0.01em !important;
     transition: all 0.15s ease !important;
+    padding: 0.5rem 1rem !important;
 }
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #1d4ed8, #4f46e5) !important;
+.stButton > button[kind="primary"],
+.stFormSubmitButton > button[kind="primaryFormSubmit"] {
+    background: #0c0a09 !important;
+    color: #ffffff !important;
     border: none !important;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.3) !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2) !important;
 }
-.stButton > button[kind="primary"]:hover {
-    box-shadow: 0 4px 14px rgba(79,70,229,0.45) !important;
+.stButton > button[kind="primary"]:hover,
+.stFormSubmitButton > button[kind="primaryFormSubmit"]:hover {
+    background: #292524 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.28) !important;
     transform: translateY(-1px) !important;
+}
+.stButton > button[kind="secondary"],
+.stButton > button:not([kind]),
+.stFormSubmitButton > button:not([kind="primaryFormSubmit"]) {
+    background: #ffffff !important;
+    border: 1px solid #ddd8d2 !important;
+    color: #44403c !important;
+}
+.stButton > button[kind="secondary"]:hover,
+.stButton > button:not([kind]):hover,
+.stFormSubmitButton > button:not([kind="primaryFormSubmit"]):hover {
+    background: #fafaf9 !important;
+    border-color: #a8a29e !important;
 }
 
 /* ── Expanders ───────────────────────────────────── */
 [data-testid="stExpander"] {
-    border-radius: 10px !important;
-    border: 1px solid #e2e8f0 !important;
-    overflow: hidden;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    border: 1px solid #e9e4dc !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
 }
 [data-testid="stExpander"] summary {
-    font-weight: 500 !important;
-    color: #1e293b !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    color: #0c0a09 !important;
+    font-size: 0.9rem !important;
+    padding: 0.85rem 1rem !important;
+}
+[data-testid="stExpander"] summary:hover {
+    background: #fafaf9 !important;
 }
 
 /* ── Tabs ────────────────────────────────────────── */
-button[data-baseweb="tab"] { font-weight: 500 !important; }
-button[data-baseweb="tab"][aria-selected="true"] { color: #1d4ed8 !important; }
+[data-testid="stTabs"] [data-baseweb="tab-list"] {
+    background: transparent !important;
+    border-bottom: 2px solid #e9e4dc !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+button[data-baseweb="tab"] {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    color: #79716b !important;
+    padding: 0.65rem 1.1rem !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    border-bottom: 2px solid transparent !important;
+    margin-bottom: -2px !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #0c0a09 !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #0c0a09 !important;
+}
 
 /* ── Inputs ──────────────────────────────────────── */
 [data-testid="stTextInput"] input,
 [data-testid="stNumberInput"] input,
-[data-testid="stDateInput"] input {
+[data-testid="stDateInput"] input,
+[data-testid="stTextArea"] textarea {
+    font-family: 'Inter', sans-serif !important;
     border-radius: 8px !important;
+    border-color: #ddd8d2 !important;
+    background: #ffffff !important;
+    color: #0c0a09 !important;
+    font-size: 0.9rem !important;
+}
+[data-testid="stTextInput"] input:focus,
+[data-testid="stNumberInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus {
+    border-color: #0c0a09 !important;
+    box-shadow: 0 0 0 3px rgba(12,10,9,0.08) !important;
 }
 [data-baseweb="select"] > div {
+    font-family: 'Inter', sans-serif !important;
     border-radius: 8px !important;
+    border-color: #ddd8d2 !important;
+    background: #ffffff !important;
+}
+[data-baseweb="select"] > div:focus-within {
+    border-color: #0c0a09 !important;
+    box-shadow: 0 0 0 3px rgba(12,10,9,0.08) !important;
+}
+
+/* ── Widget labels ───────────────────────────────── */
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    color: #44403c !important;
+}
+
+/* ── Captions ────────────────────────────────────── */
+[data-testid="stCaptionContainer"] p,
+small {
+    font-family: 'Inter', sans-serif !important;
+    color: #79716b !important;
+}
+
+/* ── File uploader ───────────────────────────────── */
+[data-testid="stFileUploader"] section {
+    border-radius: 12px !important;
+    border: 2px dashed #d6d0ca !important;
+    background: #fafaf9 !important;
+}
+
+/* ── Dataframe ───────────────────────────────────── */
+[data-testid="stDataFrame"] {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid #e9e4dc !important;
+}
+
+/* ── Alert / info boxes ──────────────────────────── */
+[data-testid="stAlert"] {
+    border-radius: 10px !important;
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 /* ── Divider ─────────────────────────────────────── */
-hr { border-color: #e2e8f0 !important; }
+hr { border-color: #e9e4dc !important; }
 </style>
 """, unsafe_allow_html=True)
 
