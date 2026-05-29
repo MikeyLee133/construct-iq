@@ -74,6 +74,15 @@ def init_db() -> None:
                 file_type   TEXT    NOT NULL,
                 created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
             );
+
+            CREATE TABLE IF NOT EXISTS checklist_items (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                phase_id    INTEGER NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
+                text        TEXT    NOT NULL,
+                category    TEXT    NOT NULL DEFAULT '',
+                completed   INTEGER NOT NULL DEFAULT 0,
+                sort_order  INTEGER NOT NULL DEFAULT 0
+            );
         """)
 
 
@@ -116,11 +125,19 @@ def delete_project(project_id: int) -> None:
 # ── Phases ────────────────────────────────────────────────────────────────────
 
 def create_phases_for_project(project_id: int, phase_names: list[str]) -> None:
+    from construct_iq.config import DEFAULT_PHASE_CHECKLISTS
     with _conn() as con:
-        con.executemany(
-            "INSERT INTO phases (project_id, name, phase_order) VALUES (?,?,?)",
-            [(project_id, name, i) for i, name in enumerate(phase_names)],
-        )
+        for i, name in enumerate(phase_names):
+            cur = con.execute(
+                "INSERT INTO phases (project_id, name, phase_order) VALUES (?,?,?)",
+                (project_id, name, i),
+            )
+            phase_id = cur.lastrowid
+            for j, item in enumerate(DEFAULT_PHASE_CHECKLISTS.get(name, [])):
+                con.execute(
+                    "INSERT INTO checklist_items (phase_id, text, category, sort_order) VALUES (?,?,?,?)",
+                    (phase_id, item["text"], item.get("category", ""), j),
+                )
 
 
 def get_phases(project_id: int) -> list[dict]:
@@ -253,3 +270,39 @@ def delete_document(doc_id: int) -> None:
         if row:
             Path(row["file_path"]).unlink(missing_ok=True)
         con.execute("DELETE FROM documents WHERE id = ?", (doc_id,))
+
+
+# ── Checklist ─────────────────────────────────────────────────────────────────
+
+def get_checklist_items(phase_id: int) -> list[dict]:
+    with _conn() as con:
+        rows = con.execute(
+            "SELECT * FROM checklist_items WHERE phase_id = ? ORDER BY sort_order, id",
+            (phase_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def toggle_checklist_item(item_id: int, completed: bool) -> None:
+    with _conn() as con:
+        con.execute(
+            "UPDATE checklist_items SET completed=? WHERE id=?",
+            (1 if completed else 0, item_id),
+        )
+
+
+def create_checklist_item(phase_id: int, text: str, category: str = "") -> None:
+    with _conn() as con:
+        max_order = con.execute(
+            "SELECT COALESCE(MAX(sort_order), -1) FROM checklist_items WHERE phase_id = ?",
+            (phase_id,),
+        ).fetchone()[0]
+        con.execute(
+            "INSERT INTO checklist_items (phase_id, text, category, sort_order) VALUES (?,?,?,?)",
+            (phase_id, text, category, max_order + 1),
+        )
+
+
+def delete_checklist_item(item_id: int) -> None:
+    with _conn() as con:
+        con.execute("DELETE FROM checklist_items WHERE id = ?", (item_id,))

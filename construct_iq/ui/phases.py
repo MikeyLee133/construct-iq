@@ -8,6 +8,7 @@ import streamlit as st
 
 from construct_iq.config import PHASE_STATUSES
 from construct_iq.database import get_phases, get_project, get_project_expenses, update_phase_status
+from construct_iq.ui.checklist import show_checklist
 from construct_iq.ui.documents import show_documents
 from construct_iq.ui.expenses import show_expenses
 from construct_iq.ui.notes import show_notes
@@ -98,9 +99,13 @@ def _phase_section(phase: dict) -> None:
 
         st.write("")
 
-        # Tabs for documents, notes, expenses
-        doc_tab, note_tab, expense_tab = st.tabs(["📄 Documents", "📝 Notes", "💰 Expenses"])
+        # Tabs
+        chk_tab, doc_tab, note_tab, expense_tab = st.tabs(
+            ["✅ Checklist", "📄 Documents", "📝 Notes", "💰 Expenses"]
+        )
 
+        with chk_tab:
+            show_checklist(phase["id"])
         with doc_tab:
             show_documents(phase["id"], phase["name"])
         with note_tab:
