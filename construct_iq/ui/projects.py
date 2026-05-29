@@ -38,11 +38,20 @@ def _status_badge(status: str) -> str:
 def show_projects_dashboard() -> None:
     col_title, col_btn = st.columns([7, 1])
     with col_title:
-        st.title("🏗️ ConstructIQ")
-        st.caption("AI-powered construction project management")
+        st.markdown("""
+        <div style="padding:0.25rem 0 0.75rem">
+            <h1 style="margin:0 0 4px;font-size:2.2rem;font-weight:800;color:#0f172a;letter-spacing:-1px">
+                🏗️ ConstructIQ
+            </h1>
+            <p style="margin:0;color:#64748b;font-size:0.9rem">
+                AI-powered construction project management
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     with col_btn:
         st.write("")
-        if st.button("＋ New Project", use_container_width=True):
+        st.write("")
+        if st.button("＋ New Project", use_container_width=True, type="primary"):
             st.session_state["view"] = "create_project"
             st.rerun()
 
@@ -51,6 +60,13 @@ def show_projects_dashboard() -> None:
     if not projects:
         st.info("No projects yet. Click '＋ New Project' to get started.")
         return
+
+    total    = len(projects)
+    active   = sum(1 for p in projects if p["status"] == "Active")
+    on_hold  = sum(1 for p in projects if p["status"] == "On Hold")
+    done     = sum(1 for p in projects if p["status"] == "Completed")
+    st.caption(f"{total} project{'s' if total != 1 else ''}  ·  {active} active  ·  {on_hold} on hold  ·  {done} completed")
+    st.write("")
 
     for project in projects:
         _project_card(project)
@@ -81,7 +97,7 @@ def _project_card(project: dict) -> None:
                 st.caption(f"Started {project['start_date']}")
 
         with col3:
-            if st.button("Open →", key=f"open_{project['id']}", use_container_width=True):
+            if st.button("Open →", key=f"open_{project['id']}", use_container_width=True, type="primary"):
                 st.session_state["view"]       = "project"
                 st.session_state["project_id"] = project["id"]
                 st.rerun()
@@ -92,21 +108,23 @@ def _project_card(project: dict) -> None:
 
 
 def show_create_project() -> None:
-    st.title("New Project")
+    _, col, _ = st.columns([1, 3, 1])
+    with col:
+        st.markdown("<h2 style='margin-bottom:1.5rem'>New Project</h2>", unsafe_allow_html=True)
 
-    with st.form("create_project_form"):
-        name       = st.text_input("Project name *", placeholder="123 Main St Renovation")
-        address    = st.text_input("Address", placeholder="123 Main St, City, State")
-        status     = st.selectbox("Status", PROJECT_STATUSES)
-        start_date = st.date_input("Start date", value=date.today())
+        with st.form("create_project_form"):
+            name       = st.text_input("Project name *", placeholder="123 Main St Renovation")
+            address    = st.text_input("Address", placeholder="123 Main St, City, State")
+            status     = st.selectbox("Status", PROJECT_STATUSES)
+            start_date = st.date_input("Start date", value=date.today())
 
-        col1, col2 = st.columns(2)
-        with col1:
-            submitted = st.form_submit_button("Create Project", use_container_width=True)
-        with col2:
-            if st.form_submit_button("Cancel", use_container_width=True):
-                st.session_state["view"] = "dashboard"
-                st.rerun()
+            c1, c2 = st.columns(2)
+            with c1:
+                submitted = st.form_submit_button("Create Project", use_container_width=True, type="primary")
+            with c2:
+                if st.form_submit_button("Cancel", use_container_width=True):
+                    st.session_state["view"] = "dashboard"
+                    st.rerun()
 
     if submitted:
         if not name.strip():
@@ -127,26 +145,28 @@ def show_edit_project(project_id: int) -> None:
         st.error("Project not found.")
         return
 
-    st.title(f"Edit — {project['name']}")
+    _, col, _ = st.columns([1, 3, 1])
+    with col:
+        st.markdown(f"<h2 style='margin-bottom:1.5rem'>Edit — {project['name']}</h2>", unsafe_allow_html=True)
 
-    with st.form("edit_project_form"):
-        name       = st.text_input("Project name *", value=project["name"])
-        address    = st.text_input("Address", value=project["address"])
-        status     = st.selectbox("Status", PROJECT_STATUSES, index=PROJECT_STATUSES.index(project["status"]))
-        start_date = st.date_input(
-            "Start date",
-            value=date.fromisoformat(project["start_date"]) if project["start_date"] else date.today(),
-        )
+        with st.form("edit_project_form"):
+            name       = st.text_input("Project name *", value=project["name"])
+            address    = st.text_input("Address", value=project["address"])
+            status     = st.selectbox("Status", PROJECT_STATUSES, index=PROJECT_STATUSES.index(project["status"]))
+            start_date = st.date_input(
+                "Start date",
+                value=date.fromisoformat(project["start_date"]) if project["start_date"] else date.today(),
+            )
 
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            submitted = st.form_submit_button("Save", use_container_width=True)
-        with col2:
-            if st.form_submit_button("Cancel", use_container_width=True):
-                st.session_state["view"] = "project"
-                st.rerun()
-        with col3:
-            delete = st.form_submit_button("Delete Project", use_container_width=True)
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                submitted = st.form_submit_button("Save Changes", use_container_width=True, type="primary")
+            with c2:
+                if st.form_submit_button("Cancel", use_container_width=True):
+                    st.session_state["view"] = "project"
+                    st.rerun()
+            with c3:
+                delete = st.form_submit_button("Delete", use_container_width=True)
 
     if submitted:
         if not name.strip():

@@ -22,15 +22,18 @@ def show_project_view(project_id: int) -> None:
     # ── Header ────────────────────────────────────────────────────────────────
     col_back, col_title, col_qa = st.columns([1, 6, 1])
     with col_back:
-        if st.button("← Back"):
+        if st.button("← Back", use_container_width=True):
             st.session_state["view"] = "dashboard"
             st.rerun()
     with col_title:
-        st.title(project["name"])
+        st.markdown(
+            f"<h1 style='margin:0 0 4px;font-size:2rem;font-weight:800;color:#0f172a;letter-spacing:-0.5px'>{project['name']}</h1>",
+            unsafe_allow_html=True,
+        )
         if project["address"]:
             st.caption(f"📍 {project['address']}")
     with col_qa:
-        if st.button("🤖 Ask AI", use_container_width=True):
+        if st.button("🤖 Ask AI", use_container_width=True, type="primary"):
             st.session_state["view"] = "qa"
             st.rerun()
 
