@@ -19,7 +19,6 @@ from construct_iq.database import (
     update_project,
 )
 
-
 _STATUS_BADGE = {
     "Active":    ("#dcfce7", "#15803d"),
     "On Hold":   ("#fef9c3", "#854d0e"),
