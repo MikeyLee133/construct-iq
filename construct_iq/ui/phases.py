@@ -7,7 +7,7 @@ Phase view — documents, notes, and expenses tabs per phase.
 import streamlit as st
 
 from construct_iq.config import PHASE_STATUSES
-from construct_iq.database import get_phases, get_project, update_phase_status
+from construct_iq.database import get_phases, get_project, get_project_expenses, update_phase_status
 from construct_iq.ui.documents import show_documents
 from construct_iq.ui.expenses import show_expenses
 from construct_iq.ui.notes import show_notes
@@ -28,15 +28,28 @@ def show_project_view(project_id: int) -> None:
     with col_title:
         st.title(project["name"])
         if project["address"]:
-            st.caption(project["address"])
+            st.caption(f"📍 {project['address']}")
     with col_qa:
         if st.button("🤖 Ask AI", use_container_width=True):
             st.session_state["view"] = "qa"
             st.rerun()
 
-    # ── Phase list ────────────────────────────────────────────────────────────
-    phases = get_phases(project_id)
+    # ── Summary metrics ───────────────────────────────────────────────────────
+    phases   = get_phases(project_id)
+    expenses = get_project_expenses(project_id)
+    total_spend = sum(e["amount"] for e in expenses)
+    completed   = sum(1 for p in phases if p["status"] == "Complete")
+    in_progress = sum(1 for p in phases if p["status"] == "In Progress")
 
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Phases Complete", f"{completed} / {len(phases)}")
+    m2.metric("In Progress", in_progress)
+    m3.metric("Total Spend", f"${total_spend:,.2f}")
+    m4.metric("Status", project["status"])
+
+    st.divider()
+
+    # ── Phase list ────────────────────────────────────────────────────────────
     for phase in phases:
         _phase_section(phase)
 

@@ -4,6 +4,7 @@ ui/documents.py
 Document upload and listing per phase.
 """
 
+import pandas as pd
 import streamlit as st
 
 from construct_iq.config import SUPPORTED_FILE_TYPES
@@ -49,18 +50,23 @@ def show_documents(phase_id: int, phase_name: str) -> None:
         st.caption("No documents uploaded yet.")
         return
 
-    for doc in docs:
-        col_name, col_type, col_del = st.columns([5, 1, 1])
-        with col_name:
-            st.text(doc["filename"])
-        with col_type:
-            st.caption(doc["file_type"].upper())
-        with col_del:
-            if st.button("🗑", key=f"del_doc_{doc['id']}"):
-                from construct_iq.database import _conn
-                with _conn() as con:
-                    row = con.execute("SELECT project_id FROM phases WHERE id = ?", (phase_id,)).fetchone()
-                    project_id = row["project_id"] if row else 0
-                delete_source(project_id, phase_id, doc["filename"])
-                delete_document(doc["id"])
-                st.rerun()
+    df = pd.DataFrame([{
+        "File": doc["filename"],
+        "Type": doc["file_type"].upper(),
+    } for doc in docs])
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    with st.expander("🗑 Remove a document"):
+        for doc in docs:
+            col_name, col_del = st.columns([6, 1])
+            with col_name:
+                st.caption(f"📄 {doc['filename']}  ({doc['file_type'].upper()})")
+            with col_del:
+                if st.button("Remove", key=f"del_doc_{doc['id']}"):
+                    from construct_iq.database import _conn
+                    with _conn() as con:
+                        row = con.execute("SELECT project_id FROM phases WHERE id = ?", (phase_id,)).fetchone()
+                        project_id = row["project_id"] if row else 0
+                    delete_source(project_id, phase_id, doc["filename"])
+                    delete_document(doc["id"])
+                    st.rerun()

@@ -20,20 +20,36 @@ from construct_iq.database import (
 )
 
 
-def show_projects_dashboard() -> None:
-    st.title("ConstructIQ")
-    st.caption("AI-powered construction project management")
+_STATUS_BADGE = {
+    "Active":    ("#dcfce7", "#15803d"),
+    "On Hold":   ("#fef9c3", "#854d0e"),
+    "Completed": ("#dbeafe", "#1e40af"),
+}
 
-    col_title, col_btn = st.columns([5, 1])
+
+def _status_badge(status: str) -> str:
+    bg, fg = _STATUS_BADGE.get(status, ("#f1f5f9", "#475569"))
+    return (
+        f'<span style="background:{bg};color:{fg};border-radius:4px;'
+        f'padding:2px 10px;font-size:12px;font-weight:600">{status}</span>'
+    )
+
+
+def show_projects_dashboard() -> None:
+    col_title, col_btn = st.columns([7, 1])
+    with col_title:
+        st.title("🏗️ ConstructIQ")
+        st.caption("AI-powered construction project management")
     with col_btn:
-        if st.button("+ New Project", use_container_width=True):
+        st.write("")
+        if st.button("＋ New Project", use_container_width=True):
             st.session_state["view"] = "create_project"
             st.rerun()
 
     projects = get_all_projects()
 
     if not projects:
-        st.info("No projects yet. Click '+ New Project' to get started.")
+        st.info("No projects yet. Click '＋ New Project' to get started.")
         return
 
     for project in projects:
@@ -48,23 +64,24 @@ def _project_card(project: dict) -> None:
     completed = sum(1 for p in phases if p["status"] == "Complete")
     progress  = completed / len(phases) if phases else 0
 
-    status_colour = {"Active": "🟢", "On Hold": "🟡", "Completed": "🔵"}.get(project["status"], "⚪")
-
     with st.container(border=True):
-        col1, col2, col3 = st.columns([4, 2, 1])
+        col1, col2, col3 = st.columns([5, 2, 1])
 
         with col1:
-            st.subheader(project["name"])
+            st.markdown(f"### {project['name']}")
             if project["address"]:
-                st.caption(project["address"])
-            st.caption(f"{status_colour} {project['status']}  ·  Started: {project['start_date'] or 'N/A'}")
+                st.caption(f"📍 {project['address']}")
+            st.markdown(_status_badge(project["status"]), unsafe_allow_html=True)
+            st.write("")
             st.progress(progress, text=f"{completed}/{len(phases)} phases complete")
 
         with col2:
             st.metric("Total Spend", f"${total:,.2f}")
+            if project["start_date"]:
+                st.caption(f"Started {project['start_date']}")
 
         with col3:
-            if st.button("Open", key=f"open_{project['id']}", use_container_width=True):
+            if st.button("Open →", key=f"open_{project['id']}", use_container_width=True):
                 st.session_state["view"]       = "project"
                 st.session_state["project_id"] = project["id"]
                 st.rerun()

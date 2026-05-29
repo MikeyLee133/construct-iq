@@ -6,6 +6,7 @@ Expense logging and listing per phase.
 
 from datetime import date
 
+import pandas as pd
 import streamlit as st
 
 from construct_iq.config import EXPENSE_CATEGORIES, SUPPORTED_FILE_TYPES
@@ -49,17 +50,25 @@ def show_expenses(phase_id: int) -> None:
         st.caption("No expenses logged yet.")
         return
 
-    for exp in expenses:
-        col_date, col_cat, col_desc, col_amt, col_del = st.columns([2, 2, 4, 2, 1])
-        with col_date:
-            st.text(exp["expense_date"])
-        with col_cat:
-            st.caption(exp["category"])
-        with col_desc:
-            st.text(exp["description"] or "—")
-        with col_amt:
-            st.text(f"${exp['amount']:,.2f}")
-        with col_del:
-            if st.button("🗑", key=f"del_exp_{exp['id']}"):
-                delete_expense(exp["id"])
-                st.rerun()
+    df = pd.DataFrame([{
+        "Date":        e["expense_date"],
+        "Category":    e["category"],
+        "Description": e["description"] or "—",
+        "Amount":      e["amount"],
+    } for e in expenses])
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={"Amount": st.column_config.NumberColumn("Amount", format="$%.2f")},
+    )
+
+    with st.expander("🗑 Remove an expense"):
+        for exp in expenses:
+            col_info, col_del = st.columns([6, 1])
+            with col_info:
+                st.caption(f"{exp['expense_date']}  ·  {exp['category']}  ·  ${exp['amount']:,.2f}  —  {exp['description'] or ''}")
+            with col_del:
+                if st.button("Remove", key=f"del_exp_{exp['id']}"):
+                    delete_expense(exp["id"])
+                    st.rerun()

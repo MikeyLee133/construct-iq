@@ -18,6 +18,14 @@ st.set_page_config(
     layout="wide",
 )
 
+st.markdown("""
+<style>
+footer { visibility: hidden; }
+[data-testid="stHeader"] { display: none; }
+[data-testid="stAppViewBlockContainer"] { padding-top: 1rem; }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialise DB on every startup — safe to call repeatedly
 init_db()
 
