@@ -8,15 +8,15 @@ Run with:  streamlit run app.py
 import os
 import warnings
 
-os.environ["TRANSFORMERS_VERBOSITY"] = "error"
-warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
-
 import streamlit as st
 
 from construct_iq.database import init_db
 from construct_iq.ui.phases import show_project_view
 from construct_iq.ui.projects import show_create_project, show_edit_project, show_projects_dashboard
 from construct_iq.ui.qa import show_qa
+
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 
 st.set_page_config(
     page_title="ConstructIQ",
